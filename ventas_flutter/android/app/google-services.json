@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "411282089411",
+    "firebase_url": "https://taxi-ed7f8.firebaseio.com",
+    "project_id": "taxi-ed7f8",
+    "storage_bucket": "taxi-ed7f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411282089411:android:f3053c4e74138897910976",
+        "android_client_info": {
+          "package_name": "com.example.ventas_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411282089411-82fhovegc8m86kpeung4rpgg7ur9hfp8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqKa8_MlpnFRYeJs0KOKAfLVG74VFJvbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411282089411-82fhovegc8m86kpeung4rpgg7ur9hfp8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

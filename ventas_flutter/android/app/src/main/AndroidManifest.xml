@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.ventas_flutter">
     <application
         android:label="ventas_flutter"
         android:name="${applicationName}"
