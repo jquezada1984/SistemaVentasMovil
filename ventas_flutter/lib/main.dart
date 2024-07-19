@@ -4,6 +4,9 @@ import 'firebase_options.dart';
 import 'views/login_view.dart';
 import 'views/tab_view.dart';
 import 'views/registration_view.dart';
+import 'views/user_list_view.dart';
+import 'views/user_detail_view.dart';
+import 'models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,14 +24,24 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/login',
+      initialRoute: '/tabs',
       routes: {
         '/login': (context) => LoginView(),
         '/tabs': (context) => TabView(),
         '/register': (context) => RegistrationView(),
+        '/users': (context) => UserListView(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/userDetail') {
+          final User user = settings.arguments as User;
+          return MaterialPageRoute(
+            builder: (context) {
+              return UserDetailView(user: user);
+            },
+          );
+        }
+        return null;
       },
     );
   }
 }
-
-

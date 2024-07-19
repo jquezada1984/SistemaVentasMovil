@@ -21,6 +21,14 @@ class _TabViewState extends State<TabView> {
               Tab(icon: Icon(Icons.person_add), text: 'Register'),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.people),
+              onPressed: () {
+                Navigator.pushNamed(context, '/users');
+              },
+            ),
+          ],
         ),
         body: TabBarView(
           children: [
@@ -32,4 +40,3 @@ class _TabViewState extends State<TabView> {
     );
   }
 }
-
