@@ -18,6 +18,7 @@ class _UserDetailViewState extends State<UserDetailView> {
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _cityController = TextEditingController();
+  final _passwordController = TextEditingController();
   final UserController _userController = UserController();
 
   @override
@@ -28,6 +29,7 @@ class _UserDetailViewState extends State<UserDetailView> {
     _addressController.text = widget.user.address;
     _phoneController.text = widget.user.phone;
     _cityController.text = widget.user.city;
+    _passwordController.text = widget.user.password; // No encriptar nuevamente
   }
 
   @override
@@ -106,6 +108,17 @@ class _UserDetailViewState extends State<UserDetailView> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Contraseña'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingrese su contraseña';
+                  }
+                  return null;
+                },
+              ),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -116,6 +129,7 @@ class _UserDetailViewState extends State<UserDetailView> {
                       address: _addressController.text,
                       phone: _phoneController.text,
                       city: _cityController.text,
+                      password: _passwordController.text, // Incluyendo la contraseña
                     );
                     try {
                       await _userController.updateUser(updatedUser);
@@ -139,4 +153,3 @@ class _UserDetailViewState extends State<UserDetailView> {
     );
   }
 }
-

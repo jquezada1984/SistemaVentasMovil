@@ -15,6 +15,7 @@ class _RegistrationViewState extends State<RegistrationView> {
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _cityController = TextEditingController();
+  final _passwordController = TextEditingController();
   final UserController _userController = UserController();
   final Uuid _uuid = Uuid();
 
@@ -83,6 +84,17 @@ class _RegistrationViewState extends State<RegistrationView> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Contraseña'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingrese su contraseña';
+                  }
+                  return null;
+                },
+              ),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -93,6 +105,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                       address: _addressController.text,
                       phone: _phoneController.text,
                       city: _cityController.text,
+                      password: _passwordController.text,
                     );
                     try {
                       await _userController.registerUser(user);

@@ -22,8 +22,9 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -36,10 +37,21 @@ class DatabaseService {
         email TEXT,
         address TEXT,
         phone TEXT,
-        city TEXT
+        city TEXT,
+        password TEXT
       )
       '''
     );
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        '''
+        ALTER TABLE users ADD COLUMN password TEXT
+        '''
+      );
+    }
   }
 
   Future<void> insertUser(User user) async {
@@ -54,6 +66,20 @@ class DatabaseService {
     return List.generate(maps.length, (i) {
       return User.fromMap(maps[i]);
     });
+  }
+
+  Future<User?> getUserByEmail(String email) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+    if (maps.isNotEmpty) {
+      return User.fromMap(maps.first);
+    } else {
+      return null;
+    }
   }
 
   Future<void> updateUser(User user) async {

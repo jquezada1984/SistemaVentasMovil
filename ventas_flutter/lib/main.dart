@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/tabs',
+      initialRoute: '/login',
       routes: {
         '/login': (context) => LoginView(),
         '/tabs': (context) => TabView(),

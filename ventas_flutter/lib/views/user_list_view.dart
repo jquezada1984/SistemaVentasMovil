@@ -68,5 +68,3 @@ class _UserListViewState extends State<UserListView> {
     );
   }
 }
-
-

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/user_controller.dart';
+import '../models/user.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -9,7 +11,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final AuthController _authController = AuthController();
+  final UserController _userController = UserController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +34,16 @@ class _LoginViewState extends State<LoginView> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  final user = await _authController.signIn(
+                  final user = await _userController.authenticateUser(
                     _emailController.text,
                     _passwordController.text,
                   );
                   if (user != null) {
                     Navigator.pushReplacementNamed(context, '/tabs');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid email or password')),
+                    );
                   }
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -53,10 +59,15 @@ class _LoginViewState extends State<LoginView> {
               },
               child: Text('Don\'t have an account? Register here'),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/users');
+              },
+              child: Text('View Registered Users'),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

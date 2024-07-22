@@ -5,6 +5,7 @@ class User {
   final String address;
   final String phone;
   final String city;
+  final String password;
 
   User({
     required this.id,
@@ -13,16 +14,18 @@ class User {
     required this.address,
     required this.phone,
     required this.city,
+    required this.password,
   });
 
   factory User.fromMap(Map<String, dynamic> data) {
     return User(
-      id: data['id'],
-      name: data['name'],
-      email: data['email'],
-      address: data['address'],
-      phone: data['phone'],
-      city: data['city'],
+      id: data['id'] ?? '',
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      address: data['address'] ?? '',
+      phone: data['phone'] ?? '',
+      city: data['city'] ?? '',
+      password: data['password'] ?? '',
     );
   }
 
@@ -34,6 +37,7 @@ class User {
       'address': address,
       'phone': phone,
       'city': city,
+      'password': password,
     };
   }
 }
