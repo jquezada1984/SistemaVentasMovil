@@ -1,53 +1,53 @@
 import 'package:flutter/material.dart';
-import '../controllers/product_controller.dart';
-import '../models/product.dart';
+import '../controllers/customer_controller.dart';
+import '../models/customer.dart';
 
-class ProductListView extends StatefulWidget {
+class CustomerListView extends StatefulWidget {
   @override
-  _ProductListViewState createState() => _ProductListViewState();
+  _CustomerListViewState createState() => _CustomerListViewState();
 }
 
-class _ProductListViewState extends State<ProductListView> {
-  final ProductController _productController = ProductController();
-  late Future<List<Product>> _productsFuture;
-  List<Product> _products = [];
-  List<Product> _filteredProducts = [];
+class _CustomerListViewState extends State<CustomerListView> {
+  final CustomerController _customerController = CustomerController();
+  late Future<List<Customer>> _customersFuture;
+  List<Customer> _customers = [];
+  List<Customer> _filteredCustomers = [];
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _productsFuture = _productController.getProducts();
-    _productsFuture.then((products) {
+    _customersFuture = _customerController.getCustomers();
+    _customersFuture.then((customers) {
       setState(() {
-        _products = products;
-        _filteredProducts = products;
+        _customers = customers;
+        _filteredCustomers = customers;
       });
     });
-    _searchController.addListener(_filterProducts);
+    _searchController.addListener(_filterCustomers);
   }
 
-  void _filterProducts() {
+  void _filterCustomers() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredProducts = _products.where((product) {
-        return product.name.toLowerCase().contains(query) ||
-               product.price.toString().contains(query);
+      _filteredCustomers = _customers.where((customer) {
+        return customer.name.toLowerCase().contains(query) ||
+               customer.ruc.toLowerCase().contains(query);
       }).toList();
     });
   }
 
-  void _refreshProducts() async {
-    final products = await _productController.getProducts();
+  void _refreshCustomers() async {
+    final customers = await _customerController.getCustomers();
     setState(() {
-      _products = products;
-      _filteredProducts = products;
+      _customers = customers;
+      _filteredCustomers = customers;
     });
   }
 
   @override
   void dispose() {
-    _searchController.removeListener(_filterProducts);
+    _searchController.removeListener(_filterCustomers);
     _searchController.dispose();
     super.dispose();
   }
@@ -55,7 +55,7 @@ class _ProductListViewState extends State<ProductListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Product List')),
+      appBar: AppBar(title: Text('Customer List')),
       body: Column(
         children: [
           Padding(
@@ -69,35 +69,35 @@ class _ProductListViewState extends State<ProductListView> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<Product>>(
-              future: _productsFuture,
+            child: FutureBuilder<List<Customer>>(
+              future: _customersFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No products found.'));
+                  return Center(child: Text('No customers found.'));
                 } else {
                   return ListView.builder(
-                    itemCount: _filteredProducts.length,
+                    itemCount: _filteredCustomers.length,
                     itemBuilder: (context, index) {
-                      final product = _filteredProducts[index];
+                      final customer = _filteredCustomers[index];
                       return ListTile(
-                        title: Text(product.name),
-                        subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+                        title: Text(customer.name),
+                        subtitle: Text(customer.ruc),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
-                            await _productController.deleteProduct(product.id);
-                            _refreshProducts();
+                            await _customerController.deleteCustomer(customer.id);
+                            _refreshCustomers();
                           },
                         ),
                         onTap: () {
                           // Navigator.pushNamed(
                           //   context,
-                          //   '/productDetail',
-                          //   arguments: product,
+                          //   '/customerDetail',
+                          //   arguments: customer,
                           // );
                         },
                       );

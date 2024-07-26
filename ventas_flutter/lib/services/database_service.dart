@@ -1,7 +1,9 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/user.dart';
-
+import '../models/product.dart';
+import '../models/customer.dart';
+import '../models/sale.dart';
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   static Database? _database;
@@ -22,7 +24,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -42,6 +44,15 @@ class DatabaseService {
       )
       '''
     );
+    await db.execute(
+      '''
+      CREATE TABLE products(
+        id TEXT PRIMARY KEY,
+        name TEXT,
+        price REAL
+      )
+      '''
+    );
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -52,8 +63,20 @@ class DatabaseService {
         '''
       );
     }
+    if (oldVersion < 3) {
+      await db.execute(
+        '''
+        CREATE TABLE products(
+          id TEXT PRIMARY KEY,
+          name TEXT,
+          price REAL
+        )
+        '''
+      );
+    }
   }
 
+  // User methods
   Future<void> insertUser(User user) async {
     final db = await database;
     await db.insert('users', user.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
@@ -91,4 +114,71 @@ class DatabaseService {
     final db = await database;
     await db.delete('users', where: 'id = ?', whereArgs: [id]);
   }
+
+  // Product methods
+  Future<void> insertProduct(Product product) async {
+    final db = await database;
+    await db.insert('products', product.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Product>> getProducts() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('products');
+
+    return List.generate(maps.length, (i) {
+      return Product.fromMap(maps[i]);
+    });
+  }
+
+  Future<void> updateProduct(Product product) async {
+    final db = await database;
+    await db.update('products', product.toMap(), where: 'id = ?', whereArgs: [product.id]);
+  }
+
+  Future<void> deleteProduct(String id) async {
+    final db = await database;
+    await db.delete('products', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // Customer methods
+Future<void> insertCustomer(Customer customer) async {
+  final db = await database;
+  await db.insert('customers', customer.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+}
+
+Future<List<Customer>> getCustomers() async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query('customers');
+
+  return List.generate(maps.length, (i) {
+    return Customer.fromMap(maps[i]);
+  });
+}
+
+Future<void> updateCustomer(Customer customer) async {
+  final db = await database;
+  await db.update('customers', customer.toMap(), where: 'id = ?', whereArgs: [customer.id]);
+}
+
+Future<void> deleteCustomer(String id) async {
+  final db = await database;
+  await db.delete('customers', where: 'id = ?', whereArgs: [id]);
+}
+
+// Sale methods
+Future<void> insertSale(Sale sale) async {
+  final db = await database;
+  await db.insert('sales', sale.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+}
+
+Future<List<Sale>> getSales() async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query('sales');
+
+  return List.generate(maps.length, (i) {
+    return Sale.fromMap(maps[i]);
+  });
+}
+
+
 }
