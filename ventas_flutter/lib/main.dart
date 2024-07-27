@@ -3,7 +3,6 @@ import 'views/user_list_view.dart';
 import 'views/product_list_view.dart';
 import 'views/customer_list_view.dart';
 import 'views/sale_list_view.dart';
-import 'views/sale_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sales Management System',
+      title: 'Main Menu',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -32,43 +31,48 @@ class MainMenu extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+          children: <Widget>[
+            // Añade la imagen aquí
+            Image.asset(
+              'assets/images/logo.png',
+              height: 200, // Ajusta el tamaño de la imagen según sea necesario
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
+              child: Text('User Management'),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UserListView()),
                 );
               },
-              child: Text('User Management'),
             ),
             ElevatedButton(
+              child: Text('Product Management'),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProductListView()),
                 );
               },
-              child: Text('Product Management'),
             ),
             ElevatedButton(
+              child: Text('Customer Management'),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => CustomerListView()),
                 );
               },
-              child: Text('Customer Management'),
             ),
             ElevatedButton(
+              child: Text('Sales Management'),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SaleListView()),
                 );
               },
-              child: Text('Sales Management'),
             ),
           ],
         ),
