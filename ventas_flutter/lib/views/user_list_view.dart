@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../controllers/user_controller.dart';
 import '../models/user.dart';
 import 'user_detail_view.dart';
-import 'user_form_view.dart';  // Asegúrate de crear esta vista
 
 class UserListView extends StatefulWidget {
   @override
@@ -11,47 +10,25 @@ class UserListView extends StatefulWidget {
 
 class _UserListViewState extends State<UserListView> {
   final UserController _userController = UserController();
-  late Future<List<User>> _usersFuture;
-  List<User> _users = [];
-  List<User> _filteredUsers = [];
-  final TextEditingController _searchController = TextEditingController();
+  late Future<List<User>> _users;
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _usersFuture = _userController.getUsers();
-    _usersFuture.then((users) {
-      setState(() {
-        _users = users;
-        _filteredUsers = users;
-      });
-    });
-    _searchController.addListener(_filterUsers);
+    _fetchUsers();
   }
 
-  void _filterUsers() {
-    final query = _searchController.text.toLowerCase();
+  void _fetchUsers() {
     setState(() {
-      _filteredUsers = _users.where((user) {
-        return user.name.toLowerCase().contains(query) ||
-               user.email.toLowerCase().contains(query);
-      }).toList();
+      _users = _userController.getUsers();
     });
   }
 
-  void _refreshUsers() async {
-    final users = await _userController.getUsers();
+  void _filterUsers(String query) {
     setState(() {
-      _users = users;
-      _filteredUsers = users;
+      _searchQuery = query;
     });
-  }
-
-  @override
-  void dispose() {
-    _searchController.removeListener(_filterUsers);
-    _searchController.dispose();
-    super.dispose();
   }
 
   @override
@@ -59,71 +36,78 @@ class _UserListViewState extends State<UserListView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('User List'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UserFormView()),
-              ).then((_) => _refreshUsers());
-            },
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            TextField(
               decoration: InputDecoration(
                 labelText: 'Search',
                 border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: (query) => _filterUsers(query),
+            ),
+            SizedBox(height: 16.0),
+            Expanded(
+              child: FutureBuilder<List<User>>(
+                future: _users,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No users found.'));
+                  } else {
+                    final filteredUsers = snapshot.data!
+                        .where((user) =>
+                            user.name.contains(_searchQuery) ||
+                            user.email.contains(_searchQuery))
+                        .toList();
+                    return ListView.builder(
+                      itemCount: filteredUsers.length,
+                      itemBuilder: (context, index) {
+                        final user = filteredUsers[index];
+                        return ListTile(
+                          title: Text(user.name),
+                          subtitle: Text(user.email),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              _userController.deleteUser(user.id);
+                              _fetchUsers();
+                            },
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserDetailView(user: user),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<User>>(
-              future: _usersFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No users found.'));
-                } else {
-                  return ListView.builder(
-                    itemCount: _filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = _filteredUsers[index];
-                      return ListTile(
-                        title: Text(user.name),
-                        subtitle: Text(user.email),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            await _userController.deleteUser(user.id);
-                            _refreshUsers();
-                          },
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => UserDetailView(user: user),
-                            ),
-                          ).then((_) => _refreshUsers());
-                        },
-                      );
-                    },
-                  );
-                }
-              },
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserDetailView(user: User(id: '', name: '', email: '', address: '', phone: '', city: '', password: '')),
             ),
-          ),
-        ],
+          ).then((_) => _fetchUsers());
+        },
       ),
     );
   }
