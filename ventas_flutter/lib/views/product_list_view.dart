@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/product_controller.dart';
 import '../models/product.dart';
+import 'product_form_view.dart';
 
 class ProductListView extends StatefulWidget {
   @override
@@ -31,8 +32,7 @@ class _ProductListViewState extends State<ProductListView> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredProducts = _products.where((product) {
-        return product.name.toLowerCase().contains(query) ||
-               product.price.toString().contains(query);
+        return product.name.toLowerCase().contains(query);
       }).toList();
     });
   }
@@ -55,7 +55,20 @@ class _ProductListViewState extends State<ProductListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Product List')),
+      appBar: AppBar(
+        title: Text('Product List'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProductFormView()),
+              ).then((_) => _refreshProducts());
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -85,7 +98,7 @@ class _ProductListViewState extends State<ProductListView> {
                       final product = _filteredProducts[index];
                       return ListTile(
                         title: Text(product.name),
-                        subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+                        subtitle: Text(product.price.toString()),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
@@ -94,11 +107,12 @@ class _ProductListViewState extends State<ProductListView> {
                           },
                         ),
                         onTap: () {
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   '/productDetail',
-                          //   arguments: product,
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductFormView(product: product),
+                            ),
+                          ).then((_) => _refreshProducts());
                         },
                       );
                     },

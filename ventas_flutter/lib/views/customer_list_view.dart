@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/customer_controller.dart';
 import '../models/customer.dart';
+import 'customer_form_view.dart';
 
 class CustomerListView extends StatefulWidget {
   @override
@@ -55,7 +56,20 @@ class _CustomerListViewState extends State<CustomerListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Customer List')),
+      appBar: AppBar(
+        title: Text('Customer List'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CustomerFormView()),
+              ).then((_) => _refreshCustomers());
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -94,11 +108,12 @@ class _CustomerListViewState extends State<CustomerListView> {
                           },
                         ),
                         onTap: () {
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   '/customerDetail',
-                          //   arguments: customer,
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CustomerFormView(customer: customer),
+                            ),
+                          ).then((_) => _refreshCustomers());
                         },
                       );
                     },
@@ -112,3 +127,4 @@ class _CustomerListViewState extends State<CustomerListView> {
     );
   }
 }
+

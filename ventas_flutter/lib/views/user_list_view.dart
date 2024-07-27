@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../controllers/user_controller.dart';
 import '../models/user.dart';
 import 'user_detail_view.dart';
+import 'user_form_view.dart';  // Asegúrate de crear esta vista
 
 class UserListView extends StatefulWidget {
   @override
@@ -56,7 +57,20 @@ class _UserListViewState extends State<UserListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('User List')),
+      appBar: AppBar(
+        title: Text('User List'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserFormView()),
+              ).then((_) => _refreshUsers());
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -95,11 +109,12 @@ class _UserListViewState extends State<UserListView> {
                           },
                         ),
                         onTap: () {
-                          Navigator.pushNamed(
+                          Navigator.push(
                             context,
-                            '/userDetail',
-                            arguments: user,
-                          );
+                            MaterialPageRoute(
+                              builder: (context) => UserDetailView(user: user),
+                            ),
+                          ).then((_) => _refreshUsers());
                         },
                       );
                     },

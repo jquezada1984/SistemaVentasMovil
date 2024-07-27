@@ -5,6 +5,9 @@ import 'views/customer_list_view.dart';
 import 'views/sale_view.dart';
 import 'views/login_view.dart';
 import 'views/tab_view.dart';
+import 'views/user_form_view.dart';
+import 'views/product_form_view.dart';
+import 'views/customer_form_view.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -35,6 +38,9 @@ class MyApp extends StatelessWidget {
         '/productList': (context) => ProductListView(),
         '/customerList': (context) => CustomerListView(),
         '/sale': (context) => SaleView(),
+        '/userForm': (context) => UserFormView(),
+        '/productForm': (context) => ProductFormView(),
+        '/customerForm': (context) => CustomerFormView(),
       },
     );
   }
