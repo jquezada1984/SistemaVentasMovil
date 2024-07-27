@@ -15,30 +15,33 @@ class ProductFormView extends StatefulWidget {
 class _ProductFormViewState extends State<ProductFormView> {
   final ProductController _productController = ProductController();
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _priceController = TextEditingController();
   final Uuid _uuid = Uuid();
-  late String _name;
-  late double _price;
 
   @override
   void initState() {
     super.initState();
     if (widget.product != null) {
-      _name = widget.product!.name;
-      _price = widget.product!.price;
-    } else {
-      _name = '';
-      _price = 0.0;
+      _nameController.text = widget.product!.name;
+      _priceController.text = widget.product!.price.toString();
     }
   }
 
-  void _saveForm() {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
+
+  void _saveProduct() {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final product = Product(
-        id: widget.product?.id ?? _uuid.v4(), // Generar un ID único si es un nuevo producto
-        name: _name,
-        price: _price,
-      );
+      final id = widget.product?.id ?? _uuid.v4();
+      final name = _nameController.text;
+      final price = double.parse(_priceController.text);
+
+      final product = Product(id: id, name: name, price: price);
       if (widget.product == null) {
         _productController.addProduct(product);
       } else {
@@ -51,44 +54,43 @@ class _ProductFormViewState extends State<ProductFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.product == null ? 'Add Product' : 'Edit Product')),
+      appBar: AppBar(
+        title: Text(widget.product == null ? 'New Product' : 'Edit Product'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: [
               TextFormField(
-                initialValue: _name,
-                decoration: InputDecoration(labelText: 'Name'),
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Product Name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Please enter a product name';
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  _name = value!;
-                },
               ),
               TextFormField(
-                initialValue: _price.toString(),
-                decoration: InputDecoration(labelText: 'Price'),
+                controller: _priceController,
+                decoration: InputDecoration(labelText: 'Product Price'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a price';
+                    return 'Please enter a product price';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid price';
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  _price = double.parse(value!);
-                },
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: _saveForm,
-                child: Text('Save'),
+                onPressed: _saveProduct,
+                child: Text('Save Product'),
               ),
             ],
           ),
@@ -97,3 +99,4 @@ class _ProductFormViewState extends State<ProductFormView> {
     );
   }
 }
+

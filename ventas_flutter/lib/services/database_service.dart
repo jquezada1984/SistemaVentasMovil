@@ -25,7 +25,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return await openDatabase(
       path,
-      version: 4,
+      version: 1,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -86,17 +86,6 @@ class DatabaseService {
       await db.execute(
         '''
         ALTER TABLE users ADD COLUMN password TEXT
-        '''
-      );
-    }
-    if (oldVersion < 3) {
-      await db.execute(
-        '''
-        CREATE TABLE products(
-          id TEXT PRIMARY KEY,
-          name TEXT,
-          price REAL
-        )
         '''
       );
     }

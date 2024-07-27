@@ -10,7 +10,6 @@ class ProductListView extends StatefulWidget {
 
 class _ProductListViewState extends State<ProductListView> {
   final ProductController _productController = ProductController();
-  late Future<List<Product>> _productsFuture;
   List<Product> _products = [];
   List<Product> _filteredProducts = [];
   final TextEditingController _searchController = TextEditingController();
@@ -18,14 +17,16 @@ class _ProductListViewState extends State<ProductListView> {
   @override
   void initState() {
     super.initState();
-    _productsFuture = _productController.getProducts();
-    _productsFuture.then((products) {
-      setState(() {
-        _products = products;
-        _filteredProducts = products;
-      });
-    });
     _searchController.addListener(_filterProducts);
+    _refreshProducts();
+  }
+
+  void _refreshProducts() async {
+    final products = await _productController.getProducts();
+    setState(() {
+      _products = products;
+      _filteredProducts = products;
+    });
   }
 
   void _filterProducts() {
@@ -34,14 +35,6 @@ class _ProductListViewState extends State<ProductListView> {
       _filteredProducts = _products.where((product) {
         return product.name.toLowerCase().contains(query);
       }).toList();
-    });
-  }
-
-  void _refreshProducts() async {
-    final products = await _productController.getProducts();
-    setState(() {
-      _products = products;
-      _filteredProducts = products;
     });
   }
 
@@ -64,7 +57,7 @@ class _ProductListViewState extends State<ProductListView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProductFormView()),
-              ).then((_) => _refreshProducts());
+              ).then((_) => _refreshProducts());  // Refresh when returning from form
             },
           ),
         ],
@@ -82,42 +75,29 @@ class _ProductListViewState extends State<ProductListView> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<Product>>(
-              future: _productsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No products found.'));
-                } else {
-                  return ListView.builder(
-                    itemCount: _filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = _filteredProducts[index];
-                      return ListTile(
-                        title: Text(product.name),
-                        subtitle: Text(product.price.toString()),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            await _productController.deleteProduct(product.id);
-                            _refreshProducts();
-                          },
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProductFormView(product: product),
-                            ),
-                          ).then((_) => _refreshProducts());
-                        },
-                      );
+            child: ListView.builder(
+              itemCount: _filteredProducts.length,
+              itemBuilder: (context, index) {
+                final product = _filteredProducts[index];
+                return ListTile(
+                  title: Text(product.name),
+                  subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () async {
+                      await _productController.deleteProduct(product.id);
+                      _refreshProducts();
                     },
-                  );
-                }
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductFormView(product: product),
+                      ),
+                    ).then((_) => _refreshProducts());  // Refresh when returning from form
+                  },
+                );
               },
             ),
           ),

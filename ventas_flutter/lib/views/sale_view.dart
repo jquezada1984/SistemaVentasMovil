@@ -6,6 +6,7 @@ import '../controllers/sale_controller.dart';
 import '../models/customer.dart';
 import '../models/product.dart';
 import '../models/sale.dart';
+import 'sale_list_view.dart';
 
 class SaleView extends StatefulWidget {
   @override
@@ -108,7 +109,10 @@ class _SaleViewState extends State<SaleView> {
         total: _total,
       );
       _saleController.addSale(sale);
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SaleListView()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select a customer and add products to the sale.')));
     }
@@ -117,7 +121,20 @@ class _SaleViewState extends State<SaleView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Sale')),
+      appBar: AppBar(
+        title: Text('Create Sale'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SaleListView()),
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -192,4 +209,6 @@ class _SaleViewState extends State<SaleView> {
     );
   }
 }
+
+
 

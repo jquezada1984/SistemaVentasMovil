@@ -19,4 +19,6 @@ class SaleController {
   Future<List<Sale>> getSales() async {
     return await _databaseService.getSales();
   }
+
+
 }
